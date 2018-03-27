@@ -395,14 +395,14 @@ class Router(formatOps: FormatOps) {
         val exclude = getExcludeIf(
           expire, {
             case RightBrace() => true
-            case close @ RightParen()
-                if opensConfigStyle(
-                  leftTok2tok(matchingParentheses(hash(close)))) =>
+            case close @ RightParen() => true
+//                if opensConfigStyle(
+//                  leftTok2tok(matchingParentheses(hash(close)))) =>
               // Example:
               // def x = foo(
               //     1
               // )
-              true
+//              true
             case _ => false
           }
         )
@@ -418,7 +418,7 @@ class Router(formatOps: FormatOps) {
                 Space,
                 0,
                 ignoreIf = newlines > 0 && !rhsIsJsNative,
-//                policy = SingleLineBlock(expire, exclude = exclude)
+                policy = SingleLineBlock(expire, exclude = exclude)
               ),
               Split(Newline, 1, ignoreIf = rhsIsJsNative)
                 .withIndent(2, expire, Left)
