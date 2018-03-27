@@ -85,7 +85,7 @@ type Row =
 type a = b_! # D
 >>>
 type a = b_! #D
-<<< ONLY #1125
+<<< #1125
 type RequiredServices = Bag
   with HasClockService
   with HasDynamicConfig
@@ -101,3 +101,13 @@ type RequiredServices = Bag
   with HasFutureService
   with HasThrottles
   with HasThrowableNotifier
+<<< ONLY #1125
+{
+def foo = Bar({aaaaaaaaaaaaaaaaaaaaa; bbbbbbbbbbbbbbbbbbbbbb})
+val foo = Bar({aaaaaaaaaaaaaaaaaaaaa; bbbbbbbbbbbbbbbbbbbbbb})
+}
+>>>
+{
+def foo = Bar({aaaaaaaaaaaaaaaaaaaaa; bbbbbbbbbbbbbbbbbbbbbb})
+val foo = Bar({aaaaaaaaaaaaaaaaaaaaa; bbbbbbbbbbbbbbbbbbbbbb})
+}
