@@ -75,3 +75,17 @@ object a {
   }
 
 }
+<<< skip two statements in case guard
+x match {
+  case () if {
+        val isSuperfluous = true
+        isSuperfluous
+      } =>
+}
+>>>
+x match {
+  case () if {
+        val isSuperfluous = true
+        isSuperfluous
+      } =>
+}

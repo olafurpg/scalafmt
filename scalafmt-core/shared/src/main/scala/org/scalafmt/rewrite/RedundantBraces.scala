@@ -93,7 +93,8 @@ case object RedundantBraces extends Rewrite {
     b.parent.exists {
 
       case _: Case =>
-        settings.generalExpressions
+        settings.generalExpressions &&
+          b.stats.lengthCompare(1) <= 0 // OK to remove if stats.length == 0
 
       case _: Term.Apply =>
         // Example: as.map { _.toString }
