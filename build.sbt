@@ -213,6 +213,106 @@ lazy val readme = scalatex
     cli
   )
 
+lazy val website = project
+  .enablePlugins(PreprocessPlugin, TutPlugin)
+  .settings(
+    allSettings,
+    noPublish,
+    tutSourceDirectory := baseDirectory.value / ".." / "docs",
+    sourceDirectory in Preprocess := tutTargetDirectory.value,
+    target in Preprocess := target.value / "docs",
+    preprocess in Preprocess := (preprocess in Preprocess).dependsOn(tut).value,
+    preprocessVars in Preprocess := Map(
+      "VERSION" -> version.value
+    )
+  )
+  .dependsOn(coreJVM, cli)
+
+def CiCommand(name: String)(commands: List[String]): Command =
+  Command.command(name) { initState =>
+    commands.foldLeft(initState) {
+      case (state, command) => ci(command) :: state
+    }
+  }
+def ci(command: String) = s"plz ${sys.env("CI_SCALA_VERSION")} $command"
+
+def shouldPublishToBintray: Boolean = {
+  if (!new File(sys.props("user.home") + "/.bintray/.credentials").exists)
+    false
+  else if (sys.props("publish.sonatype") != null) false
+  else if (sys.env.contains("CI_PULL_REQUEST")) false
+  else true
+}
+
+lazy val noDocs = Seq(
+  sources in (Compile, doc) := Nil
+)
+
+lazy val compilerOptions = Seq(
+  "-deprecation",
+  "-encoding",
+  "UTF-8",
+  "-feature",
+  "-language:existentials",
+  "-language:higherKinds",
+  "-language:implicitConversions",
+  "-unchecked",
+  "-Yno-adapted-args",
+  "-Ywarn-dead-code",
+  "-Ywarn-numeric-widen",
+  "-Xfuture",
+  "-Xlint"
+)
+
+lazy val publishSettings = Seq(
+  publishMavenStyle := true,
+  publishArtifact := true,
+  bintrayRepository := "maven",
+  bintrayOrganization := Some("scalameta"),
+  publishTo := {
+    if (shouldPublishToBintray) publishTo.in(bintray).value
+    else {
+      val nexus = "https://oss.sonatype.org/"
+      if (isSnapshot.value)
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else
+        Some("releases" at nexus + "service/local/staging/deploy/maven2")
+    }
+  },
+  publishArtifact in Test := false,
+  mimaPreviousArtifacts := Set(
+    organization.value % s"${moduleName.value}_${scalaBinaryVersion.value}" % "1.0.0"
+  ),
+  mimaBinaryIssueFilters ++= Mima.ignoredABIProblems,
+  licenses := Seq(
+    "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
+  ),
+  homepage := Some(url("https://github.com/scalameta/scalafmt")),
+  autoAPIMappings := true,
+  apiURL := Some(url("https://olafurpg.github.io/scalafmt/docs/")),
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/scalameta/scalafmt"),
+      "scm:git:git@github.com:scalameta/scalafmt.git"
+    )
+  ),
+  pomExtra :=
+    <developers>
+        <developer>
+          <id>olafurpg</id>
+          <name>Ólafur Páll Geirsson</name>
+          <url>https://geirsson.com</url>
+        </developer>
+      </developers>
+)
+
+lazy val noPublish = Seq(
+  mimaPreviousArtifacts := Set.empty,
+  publishArtifact := false,
+  publish := {},
+  publishLocal := {}
+)
+
 val V = "\\d+\\.\\d+\\.\\d+"
 val ReleaseCandidate = s"($V-RC\\d+).*".r
 val Milestone = s"($V-M\\d+).*".r
