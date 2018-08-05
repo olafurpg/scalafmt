@@ -1,5 +1,5 @@
 import Dependencies._
-import sbtcrossproject.crossProject
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 def scala211 = "2.11.12"
 def scala212 = "2.12.6"
@@ -41,16 +41,17 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full
     ),
     buildInfoSettings,
-    fork.in(run).in(Test) := true,
     libraryDependencies ++= Seq(
       metaconfig.value,
       scalameta.value
     )
   )
   .jsSettings(
+    SettingKey[Boolean]("ide-skip-project") := true,
     libraryDependencies += metaconfigHocon.value
   )
   .jvmSettings(
+    fork.in(run).in(Test) := true,
     libraryDependencies += metaconfigTypesafe.value
   )
   .enablePlugins(BuildInfoPlugin)
@@ -137,7 +138,6 @@ lazy val intellij = project
     cleanFiles += ideaDownloadDirectory.value
   )
   .dependsOn(coreJVM, cli)
-  .enablePlugins(SbtIdeaPlugin)
 
 lazy val tests = project
   .in(file("scalafmt-tests"))
@@ -184,40 +184,11 @@ lazy val benchmarks = project
   .dependsOn(coreJVM)
   .enablePlugins(JmhPlugin)
 
-lazy val readme = scalatex
-  .ScalatexReadme(
-    projectId = "readme",
-    wd = file(""),
-    url = "https://github.com/scalameta/scalafmt/tree/master",
-    source = "Readme"
-  )
-  .settings(
-    git.remoteRepo := "git@github.com:scalameta/scalafmt.git",
-    siteSourceDirectory := target.value / "scalatex",
-    skip in publish := true,
-    publish := {
-      ghpagesPushSite
-        .dependsOn(run.in(Compile).toTask(" --validate-links"))
-        .value
-    },
-    test := {
-      run.in(Compile).toTask(" --validate-links").value
-    },
-    libraryDependencies ++= Seq(
-      "com.twitter" %% "util-eval" % "6.41.0"
-    )
-  )
-  .enablePlugins(GhpagesPlugin)
-  .dependsOn(
-    coreJVM,
-    cli
-  )
-
 lazy val website = project
   .enablePlugins(PreprocessPlugin, TutPlugin)
+  .configs(Tut, Preprocess)
   .settings(
-    allSettings,
-    noPublish,
+    skip in publish := true,
     tutSourceDirectory := baseDirectory.value / ".." / "docs",
     sourceDirectory in Preprocess := tutTargetDirectory.value,
     target in Preprocess := target.value / "docs",
@@ -229,7 +200,6 @@ lazy val website = project
     )
   )
   .dependsOn(coreJVM, cli)
-
 
 val V = "\\d+\\.\\d+\\.\\d+"
 val ReleaseCandidate = s"($V-RC\\d+).*".r
