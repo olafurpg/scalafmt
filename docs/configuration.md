@@ -78,7 +78,35 @@ website.default(_.assumeStandardLibraryStripMargin)
 If `true`, the margin character `|` is aligned with the opening triple quote
 `"""` in interpolated and raw string literals.
 
-// TODO(gabro): add example
+```tut:passthrough
+website.exampleBlock("""
+// bananas
+val example1 =
+  s'''Examples:
+     |  * one
+     |  * two
+     |  * $three
+     |'''.stripMargin
+""",
+  "assumeStandardLibraryStripMargin = true"
+)
+```
+
+Pipes are also aligned if the first pipe character appears after the opening
+`"""`.
+
+```tut:passthrough
+website.exampleBlock("""
+val example2 =
+  s'''|Examples:
+      |  * one
+      |  * two
+      |  * $three
+      |'''.stripMargin
+""",
+  "assumeStandardLibraryStripMargin = true"
+)
+```
 
 ## Indentation
 
