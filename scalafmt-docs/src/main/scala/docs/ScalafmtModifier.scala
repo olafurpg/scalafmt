@@ -38,10 +38,16 @@ class ScalafmtModifier extends StringModifier {
               val configText = config.text.trim
               val configBlock =
                 if (configText == "") ""
-                else
-                  mdConfigSection(
-                    "Config for this example",
-                    mdCodeBlock("scala", configText))
+                else {
+
+                  val out =
+                    mdConfigSection("Config for this example", pre(configText))
+                  if (configText.contains("SortModifiers")) {
+                    println(configText)
+                    pprint.log(out)
+                  }
+                  out
+                }
 
               val formattedCodeBlock =
                 mdCodeBlock("scala formatted", formatted.trim)
@@ -66,6 +72,8 @@ class ScalafmtModifier extends StringModifier {
     }
   }
 
+  private def pre(content: String): String =
+    s"<pre><code>$content</code></pre>"
   private def mdCodeBlock(language: String, content: String): String =
     s"```$language\n$content\n```"
 

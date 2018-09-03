@@ -24,14 +24,24 @@ class DefaultsModifier extends StringModifier {
         Conf.printHocon(ScalafmtConfig.default)
       "```\n" + result + "\n```"
     } else {
-      val path = code.text.split("\\.").toList
-      val down = path.foldLeft(default.dynamic)(_ selectDynamic _)
-      down.asConf match {
-        case Configured.Ok(value) =>
-          "Default: `" + code.text.trim + " = " + value.toString + "`\n"
-        case Configured.NotOk(e) =>
-          reporter.error(Position.Range(code, 0, 0), e.toString())
-          "fail"
+      def default(key: String): String = {
+        val path = key.split("\\.").toList
+        val down = path.foldLeft(this.default.dynamic)(_ selectDynamic _)
+        down.asConf match {
+          case Configured.Ok(value) =>
+            value.toString()
+            "`" + key + " = " + value.toString + "`\n"
+          case Configured.NotOk(e) =>
+            reporter.error(Position.Range(code, 0, 0), e.toString())
+            "fail"
+        }
+      }
+      val lines = code.text.trim.lines.toList.map(default)
+      lines match {
+        case line :: Nil =>
+          "Default: " + line
+        case _ =>
+          lines.mkString("Defaults:\n* ", "\n* ", "\n")
       }
     }
   }

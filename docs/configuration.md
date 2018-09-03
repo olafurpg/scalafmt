@@ -497,15 +497,12 @@ rewrite.redundantBraces.stringInterpolation = true
 q"Hello ${name}"
 ```
 
-Configuration options and default values:
-
-// TODO(olafur): multiline defaults
-
-- `rewrite.redundantBraces.maxLines = 100`
-- `rewrite.redundantBraces.includeUnitMethods = true`
-- `rewrite.redundantBraces.stringInterpolation = true`
-- `rewrite.redundantBraces.generalExpressions = false` (disabled by default due
-  to #1147)
+```scala mdoc:defaults
+rewrite.redundantBraces.maxLines
+rewrite.redundantBraces.includeUnitMethods
+rewrite.redundantBraces.stringInterpolation
+rewrite.redundantBraces.generalExpressions
+```
 
 ### `RedundantParens`
 

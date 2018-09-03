@@ -3,6 +3,7 @@ resolvers ++= Seq(
   Resolver.bintrayIvyRepo("jetbrains", "sbt-plugins")
 )
 
+addSbtPlugin("com.geirsson" % "sbt-docusaurus" % "0.1.1")
 addSbtPlugin("com.geirsson" % "sbt-ci-release" % "1.2.1")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.7.0")
 addSbtPlugin(
