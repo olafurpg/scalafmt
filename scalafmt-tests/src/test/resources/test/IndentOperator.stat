@@ -94,7 +94,7 @@ object TestRoutes {
       ???
     }
 }
-<<< #848
+<<< ONLY #848
   val x =
   1 +
   2 +
@@ -104,7 +104,17 @@ val x =
   1 +
   2 +
   3
-<<< #848 same line
+<<< ONLY #848 right-associative
+  val x =
+  1 ::
+  2 ::
+  3
+>>>
+val x =
+  1 +
+  2 +
+  3
+<<< ONLY #848 same line
   val x = 1 +
   2 +
   3
@@ -134,3 +144,9 @@ val x = y andThen List(
   a,
   b
 )
+<<< #1223 2 infix operator two
+  val x = 1 + 2 +
+    3
+>>>
+val x = 1 + 2 +
+  3

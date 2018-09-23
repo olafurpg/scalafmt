@@ -223,6 +223,28 @@ object TreeOps {
       case _ => accum
     }
   }
+  final def parentsIterator(tree: Tree): Iterator[Tree] = {
+    new scala.collection.AbstractIterator[Tree] {
+      private[this] var curr: Tree = tree
+      override def hasNext: Boolean =
+        curr.parent.isDefined
+      override def next(): Tree = {
+        curr = curr.parent.get
+        curr
+      }
+    }
+  }
+
+  final def isExceptionalTopLevelInfixOperatorThatForcesIndent(
+      tree: Tree): Boolean = {
+    val firstNonInfix =
+      parentsIterator(tree).dropWhile(_.is[Term.ApplyInfix]).take(1)
+    firstNonInfix.toList match {
+      case (defn: Defn) :: Nil =>
+        defn.pos.startLine == tree.pos.startLine
+      case _ => false
+    }
+  }
 
   def isTopLevel(tree: Tree): Boolean = tree match {
     case _: Pkg | _: Source => true

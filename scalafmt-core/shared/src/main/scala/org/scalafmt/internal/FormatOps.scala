@@ -488,6 +488,10 @@ class FormatOps(val tree: Tree, val initStyle: ScalafmtConfig) {
         throw new IllegalStateException(s"Missing . in select ${chain.last}")
     lastToken(owners(getSelectsLastToken(lastDot)))
   }
+  val x = List(
+    1,
+    2
+  )
 
   def infixSplit(owner: Term.ApplyInfix, formatToken: FormatToken)(
       implicit line: sourcecode.Line): Split =
@@ -502,25 +506,34 @@ class FormatOps(val tree: Tree, val initStyle: ScalafmtConfig) {
     val modification = newlines2Modification(
       formatToken.between,
       rightIsComment = formatToken.right.isInstanceOf[Comment])
-    def isAssignment =
-      formatToken.left.is[Token.Equals] &&
-        owners(formatToken.left).is[Defn]
+    def isUnindentedToplevelOperator: Boolean =
+      style.unindentTopLevelOperators && {
+        !modification.isNewline || {
+          logger.elem(
+            op,
+            owner,
+            owner.structure,
+            isExceptionalTopLevelInfixOperatorThatForcesIndent(owner)
+          )
+          !isExceptionalTopLevelInfixOperatorThatForcesIndent(owner)
+        }
+      }
     val indent: Int = {
-      if (style.unindentTopLevelOperators && isAssignment &&
-        newlinesBetween(next(next(formatToken)).between) > 0) {
-        // see https://github.com/scalameta/scalafmt/issues/848
-        2
-      } else if ((style.unindentTopLevelOperators ||
+      if ((isUnindentedToplevelOperator ||
         isTopLevelInfixApplication(owner)) &&
         (style.indentOperator.includeRegexp
           .findFirstIn(op.tokens.head.syntax)
           .isEmpty ||
         style.indentOperator.excludeRegexp
           .findFirstIn(op.tokens.head.syntax)
-          .isDefined)) 0
-      else if (!modification.isNewline &&
-        !isAttachedSingleLineComment(formatToken.right, formatToken.between)) 0
-      else 2
+          .isDefined)) {
+        0
+      } else if (!modification.isNewline &&
+        !isAttachedSingleLineComment(formatToken.right, formatToken.between)) {
+        0
+      } else {
+        2
+      }
     }
     val isRightAssociative =
       // NOTE. Silly workaround because we call infixSplit from assignment =, see #798
