@@ -587,6 +587,14 @@ class Router(formatOps: FormatOps) {
           if !style.spaces.afterKeywordBeforeParen =>
         Seq(Split(NoSplit, 0))
 
+      case FormatToken(LeftParen(), _, _)
+          if !style.binPack.unsafeCallSite && (leftOwner match {
+            case Term.Apply(_, (_: Term.Function) :: Nil) => true
+            case _ => false
+          }) =>
+        Seq(
+          Split(NoSplit, 0)
+        )
       case tok @ FormatToken(LeftParen() | LeftBracket(), right, between)
           if !isSuperfluousParenthesis(formatToken.left, leftOwner) &&
             (!style.binPack.unsafeCallSite && isCallSite(leftOwner)) ||

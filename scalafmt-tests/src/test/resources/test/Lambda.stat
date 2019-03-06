@@ -1,0 +1,24 @@
+# 40 columns                            |
+maxColumn = 40
+<<< basic
+parametersList.map(parameter => applySettingsGenerator(parameter))
+>>>
+parametersList.map(parameter =>
+  applySettingsGenerator(parameter))
+<<< basic 2
+parametersList.map((parameter, b) => applySettingsGenerator(parameter))
+>>>
+parametersList.map((parameter, b) =>
+  applySettingsGenerator(parameter))
+<<< basic 3
+parametersList.map(x => x)
+>>>
+parametersList.map(x => x)
+<<< basic 4
+parametersList.map(
+  x => x
+)
+>>>
+parametersList.map(
+  x => x
+)
