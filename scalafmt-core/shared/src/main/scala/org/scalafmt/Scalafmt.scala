@@ -38,7 +38,7 @@ object Scalafmt {
     *         exceptions, use [[Formatted.Success.get]] to get back a
     *         string.
     */
-  def format(
+  @noinline def format(
       code: String,
       style: ScalafmtConfig,
       range: Set[Range],

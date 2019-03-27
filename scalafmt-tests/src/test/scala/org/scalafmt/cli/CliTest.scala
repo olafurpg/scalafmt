@@ -19,6 +19,7 @@ import FileTestOps._
 import java.io.IOException
 
 import org.scalafmt.Versions
+import org.scalafmt.dynamic.ScalafmtDynamic
 
 abstract class AbstractCliTest extends FunSuite with DiffAssertions {
   def mkArgs(str: String): Array[String] =

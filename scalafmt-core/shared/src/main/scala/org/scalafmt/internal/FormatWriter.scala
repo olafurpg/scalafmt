@@ -14,6 +14,7 @@ import scala.meta.Type
 import scala.meta.prettyprinters.Syntax
 import scala.meta.tokens.Token
 import scala.meta.tokens.Token._
+import scala.meta.internal.platform
 import java.util.regex.Pattern
 
 import org.scalafmt.internal.FormatWriter.FormatLocation
@@ -79,8 +80,11 @@ class FormatWriter(formatOps: FormatOps) {
     trailingSpace.matcher(str).replaceAll("")
   }
 
-  val leadingAsteriskSpace =
-    Pattern.compile("\n *\\*(?!\\*)", Pattern.MULTILINE)
+  val leadingAsteriskSpace = Pattern.compile(
+    if (platform.isJVM || platform.isJS) "\n *\\*(?!\\*)"
+    else "\n *\\*", // TODO: incompatible native regexp
+    Pattern.MULTILINE
+  )
   private def formatComment(comment: Comment, indent: Int): String = {
     val alignedComment =
       if (comment.syntax.startsWith("/*") &&

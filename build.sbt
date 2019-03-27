@@ -21,13 +21,18 @@ inThisBuild(
     ),
     scalaVersion := scala212,
     crossScalaVersions := List(scala212, scala211),
-    resolvers += Resolver.sonatypeRepo("releases"),
+    resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies ++= List(
       scalatest.value % Test,
-      scalacheck % Test,
+      "org.scalacheck" %% "scalacheck" % "1.13.5",
       scalametaTestkit % Test
     )
   )
+)
+lazy val nativeSettings = List(
+  nativeLinkStubs := true,
+  scalaVersion := scala211,
+  crossScalaVersions := List(scala211)
 )
 
 name := "scalafmtRoot"
@@ -47,23 +52,33 @@ commands += Command.command("ci-test") { s =>
     s
 }
 
-lazy val dynamic = project
+lazy val dynamic = crossProject(JVMPlatform, NativePlatform)
   .in(file("scalafmt-dynamic"))
   .settings(
     moduleName := "scalafmt-dynamic",
     description := "Implementation of scalafmt-interfaces",
     buildInfoSettings,
     buildInfoPackage := "org.scalafmt.dynamic",
-    buildInfoObject := "BuildInfo",
+    buildInfoObject := "BuildInfo"
+  )
+  .nativeSettings(
+    nativeSettings,
+    libraryDependencies ++= List(
+      "org.ekrich" %% "sconfig" % "0.8.0"
+      )
+    )
+  .jvmSettings(
     libraryDependencies ++= List(
       "com.geirsson" %% "coursier-small" % "1.3.1",
       "com.typesafe" % "config" % "1.3.3",
       scalatest.value % Test,
       scalametaTestkit % Test
+      )
     )
-  )
-  .dependsOn(interfaces)
+  .jvmConfigure(_.dependsOn(interfaces))
   .enablePlugins(BuildInfoPlugin)
+lazy val dynamicJVM = dynamic.jvm
+lazy val dynamicNative = dynamic.native
 
 lazy val interfaces = project
   .in(file("scalafmt-interfaces"))
@@ -85,7 +100,7 @@ lazy val interfaces = project
     }
   )
 
-lazy val core = crossProject(JVMPlatform, JSPlatform)
+lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .in(file("scalafmt-core"))
   .settings(
     moduleName := "scalafmt-core",
@@ -107,26 +122,33 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       scalatest.value % Test // must be here for coreJS/test to run anything
     )
   )
+  .nativeSettings(
+    scalaVersion := scala211,
+    nativeLinkStubs := true,
+    libraryDependencies ++= List(
+      metaconfigSconfig.value,
+      scalatest.value % Test
+    )
+  )
   .jvmSettings(
     fork.in(run).in(Test) := true,
     libraryDependencies ++= List(
-      metaconfigTypesafe.value
+      metaconfigSconfig.value
     )
   )
   .enablePlugins(BuildInfoPlugin)
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
+lazy val coreNative = core.native
 
-lazy val cli = project
+lazy val cli = crossProject(JVMPlatform, NativePlatform)
   .in(file("scalafmt-cli"))
   .settings(
     moduleName := "scalafmt-cli",
     mainClass in assembly := Some("org.scalafmt.cli.Cli"),
     assemblyJarName.in(assembly) := "scalafmt.jar",
     libraryDependencies ++= Seq(
-      "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0",
-      "com.martiansoftware" % "nailgun-server" % "0.9.1",
-      "com.github.scopt" %% "scopt" % "3.5.0",
+      "com.github.scopt" %%% "scopt" % "3.7.1",
       // undeclared transitive dependency of coursier-small
       "org.scala-lang.modules" %% "scala-xml" % "1.1.1"
     ),
@@ -137,11 +159,21 @@ lazy val cli = project
       }
     }
   )
-  .dependsOn(coreJVM, dynamic)
+  .nativeSettings(nativeSettings)
+  .jvmSettings(
+    libraryDependencies ++= List(
+      "com.martiansoftware" % "nailgun-server" % "0.9.1",
+      "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0"
+    )
+    )
+  .dependsOn(core, dynamic)
+lazy val cliJVM = cli.jvm
+lazy val cliNative = cli.native
 
 lazy val intellij = project
   .in(file("scalafmt-intellij"))
   .settings(
+    TaskKey[Unit]("bloopInstall") := {},
     buildInfoSettings,
     crossScalaVersions := List(scala211),
     skip in publish := true,
@@ -154,7 +186,7 @@ lazy val intellij = project
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
     cleanFiles += ideaDownloadDirectory.value
   )
-  .dependsOn(coreJVM, cli)
+  .dependsOn(coreJVM, cliJVM)
   .enablePlugins(SbtIdeaPlugin)
 
 lazy val tests = project
@@ -163,13 +195,13 @@ lazy val tests = project
     skip in publish := true,
     libraryDependencies ++= Seq(
       // Test dependencies
-      "com.lihaoyi" %% "scalatags" % "0.6.3",
-      "org.typelevel" %% "paiges-core" % "0.2.0",
+      "com.lihaoyi" %%% "scalatags" % "0.6.8",
+      "org.typelevel" %%% "paiges-core" % "0.2.2",
       scalametaTestkit
     )
   )
   .dependsOn(
-    cli
+    cliJVM
   )
 
 lazy val benchmarks = project
@@ -207,7 +239,7 @@ lazy val docs = project
     skip in publish := true,
     mdoc := run.in(Compile).evaluated
   )
-  .dependsOn(cli, dynamic)
+  .dependsOn(cliJVM, dynamicJVM)
   .enablePlugins(DocusaurusPlugin)
 
 val V = "\\d+\\.\\d+\\.\\d+"
