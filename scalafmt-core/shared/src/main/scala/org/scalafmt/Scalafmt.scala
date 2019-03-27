@@ -21,6 +21,13 @@ import org.scalafmt.rewrite.Rewrite
   */
 object Scalafmt {
 
+  def main(args: Array[String]): Unit = {
+    if (args.isEmpty) sys.error("missing file")
+    import java.nio.file._
+    val code = new String(Files.readAllBytes(Paths.get(args.head)))
+    println(format(code))
+  }
+
   private val WindowsLineEnding = "\r\n"
   private val UnixLineEnding = "\n"
 

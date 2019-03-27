@@ -108,9 +108,11 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
   .nativeSettings(
+    scalaVersion := scala211,
+    nativeLinkStubs := true,
     libraryDependencies ++= List(
       metaconfigSconfig.value,
-      scalatest.value % Test // must be here for coreJS/test to run anything
+      scalatest.value % Test
     )
   )
   .jvmSettings(

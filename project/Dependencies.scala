@@ -5,7 +5,7 @@ import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 // scalafmt: { maxColumn = 120, style = defaultWithAlign }
 
 object Dependencies {
-  val metaconfigV = "0.9.2-2-56fb3c00-SNAPSHOT"
+  val metaconfigV = "0.9.3-SNAPSHOT"
   val scalametaV = "4.0.0"
   val scalatestV = "3.2.0-SNAP10"
   val scalacheckV = "1.13.5"

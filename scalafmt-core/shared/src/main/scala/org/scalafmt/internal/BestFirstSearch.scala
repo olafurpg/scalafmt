@@ -155,7 +155,7 @@ class BestFirstSearch(
       depth: Int = 0,
       maxCost: Int = Integer.MAX_VALUE
   ): State = {
-    val Q = new PriorityQueue[State]()
+    val Q = new scala.collection.mutable.PriorityQueue[State]()
     var result = start
     var lastDequeue = start
     Q += start
