@@ -85,7 +85,7 @@ lazy val interfaces = project
     }
   )
 
-lazy val core = crossProject(JVMPlatform, JSPlatform)
+lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .in(file("scalafmt-core"))
   .settings(
     moduleName := "scalafmt-core",
@@ -107,6 +107,12 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       scalatest.value % Test // must be here for coreJS/test to run anything
     )
   )
+  .nativeSettings(
+    libraryDependencies ++= List(
+      metaconfigSconfig.value,
+      scalatest.value % Test // must be here for coreJS/test to run anything
+    )
+  )
   .jvmSettings(
     fork.in(run).in(Test) := true,
     libraryDependencies ++= List(
@@ -116,6 +122,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .enablePlugins(BuildInfoPlugin)
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
+lazy val coreNative = core.native
 
 lazy val cli = project
   .in(file("scalafmt-cli"))
