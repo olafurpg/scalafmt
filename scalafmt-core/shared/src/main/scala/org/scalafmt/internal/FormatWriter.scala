@@ -80,7 +80,7 @@ class FormatWriter(formatOps: FormatOps) {
   }
 
   val leadingAsteriskSpace =
-    Pattern.compile("\n *\\*(?!\\*)", Pattern.MULTILINE)
+    Pattern.compile("$a", Pattern.MULTILINE)
   private def formatComment(comment: Comment, indent: Int): String = {
     val alignedComment =
       if (comment.syntax.startsWith("/*") &&

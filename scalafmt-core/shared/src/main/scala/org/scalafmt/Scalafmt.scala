@@ -24,8 +24,19 @@ object Scalafmt {
   def main(args: Array[String]): Unit = {
     if (args.isEmpty) sys.error("missing file")
     import java.nio.file._
-    val code = new String(Files.readAllBytes(Paths.get(args.head)))
-    println(format(code))
+    def read(name: String): String = 
+      new String(Files.readAllBytes(Paths.get(name)))
+    val config = org.scalafmt.config.Config.fromHoconString(read(".scalafmt.conf")).get
+    val code = read(args(1))
+    val count = args(0).toInt
+    val results = new Array[Long](count)
+    0.until(count).foreach { i =>
+      val start = System.nanoTime()
+      format(code, config)
+      val end = System.nanoTime()
+      results(i) = end - start
+    }
+    results.foreach(println)
   }
 
   private val WindowsLineEnding = "\r\n"
@@ -45,7 +56,7 @@ object Scalafmt {
     *         exceptions, use [[Formatted.Success.get]] to get back a
     *         string.
     */
-  def format(
+  @noinline def format(
       code: String,
       style: ScalafmtConfig,
       range: Set[Range],
