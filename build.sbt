@@ -21,10 +21,9 @@ inThisBuild(
     ),
     scalaVersion := scala212,
     crossScalaVersions := List(scala212, scala211),
-    resolvers += Resolver.sonatypeRepo("releases"),
+    resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies ++= List(
       scalatest.value % Test,
-      scalacheck % Test,
       scalametaTestkit % Test
     )
   )
@@ -118,13 +117,24 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .jvmSettings(
     fork.in(run).in(Test) := true,
     libraryDependencies ++= List(
-      metaconfigTypesafe.value
+      metaconfigSconfig.value,
     )
   )
   .enablePlugins(BuildInfoPlugin)
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 lazy val coreNative = core.native
+
+lazy val ncli = crossProject(JVMPlatform, NativePlatform)
+  .in(file("scalafmt-ncli"))
+  .settings(
+    moduleName := "scalafmt-ncli",
+    libraryDependencies ++= Seq(
+      "com.github.scopt" %%% "scopt" % "3.7.1"
+    ),
+    crossScalaVersions := List(scala211)
+  )
+  .dependsOn(core)
 
 lazy val cli = project
   .in(file("scalafmt-cli"))
@@ -151,6 +161,7 @@ lazy val cli = project
 lazy val intellij = project
   .in(file("scalafmt-intellij"))
   .settings(
+    TaskKey[Unit]("bloopInstall") := {},
     buildInfoSettings,
     crossScalaVersions := List(scala211),
     skip in publish := true,
@@ -172,8 +183,8 @@ lazy val tests = project
     skip in publish := true,
     libraryDependencies ++= Seq(
       // Test dependencies
-      "com.lihaoyi" %% "scalatags" % "0.6.3",
-      "org.typelevel" %% "paiges-core" % "0.2.0",
+      "com.lihaoyi" %%% "scalatags" % "0.6.8",
+      "org.typelevel" %%% "paiges-core" % "0.2.2",
       scalametaTestkit
     )
   )
