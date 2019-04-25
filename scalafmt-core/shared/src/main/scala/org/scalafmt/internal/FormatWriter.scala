@@ -80,11 +80,7 @@ class FormatWriter(formatOps: FormatOps) {
     trailingSpace.matcher(str).replaceAll("")
   }
 
-  val leadingAsteriskSpace = Pattern.compile(
-    if (platform.isJVM || platform.isJS) "\n *\\*(?!\\*)"
-    else "\n *\\*", // TODO: incompatible native regexp
-    Pattern.MULTILINE
-  )
+  val leadingAsteriskSpace = Pattern.compile("^\\s*\\*", Pattern.MULTILINE)
   private def formatComment(comment: Comment, indent: Int): String = {
     val alignedComment =
       if (comment.syntax.startsWith("/*") &&
@@ -95,7 +91,7 @@ class FormatWriter(formatOps: FormatOps) {
           else " " * (indent + 1)
         leadingAsteriskSpace
           .matcher(comment.syntax)
-          .replaceAll(s"\n$spaces\\*")
+          .replaceAll(s"$spaces\\*")
       } else {
         comment.syntax
       }
