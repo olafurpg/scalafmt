@@ -89,9 +89,20 @@ class FormatWriter(formatOps: FormatOps) {
         val spaces: String =
           if (isDocstring && initStyle.scalaDocs) " " * (indent + 2)
           else " " * (indent + 1)
-        leadingAsteriskSpace
-          .matcher(comment.syntax)
-          .replaceAll(s"$spaces\\*")
+        val syntax = comment.syntax
+        val matcher = leadingAsteriskSpace.matcher(syntax)
+        val out = new java.lang.StringBuffer()
+        val indentedAsterisk = s"$spaces\\*"
+        while (matcher.find()) {
+          if (matcher.end() < syntax.length() &&
+            syntax.charAt(matcher.end()) == '*') {
+            () // Do nothing, preserve formatting.
+          } else {
+            matcher.appendReplacement(out, indentedAsterisk)
+          }
+        }
+        matcher.appendTail(out)
+        out.toString()
       } else {
         comment.syntax
       }

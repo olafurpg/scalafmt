@@ -65,16 +65,16 @@ lazy val dynamic = crossProject(JVMPlatform, NativePlatform)
     nativeSettings,
     libraryDependencies ++= List(
       "org.ekrich" %% "sconfig" % "0.8.0"
-      )
     )
+  )
   .jvmSettings(
     libraryDependencies ++= List(
       "com.geirsson" %% "coursier-small" % "1.3.1",
       "com.typesafe" % "config" % "1.3.3",
       scalatest.value % Test,
       scalametaTestkit % Test
-      )
     )
+  )
   .jvmConfigure(_.dependsOn(interfaces))
   .enablePlugins(BuildInfoPlugin)
 lazy val dynamicJVM = dynamic.jvm
@@ -165,7 +165,7 @@ lazy val cli = crossProject(JVMPlatform, NativePlatform)
       "com.martiansoftware" % "nailgun-server" % "0.9.1",
       "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0"
     )
-    )
+  )
   .dependsOn(core, dynamic)
 lazy val cliJVM = cli.jvm
 lazy val cliNative = cli.native

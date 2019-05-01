@@ -13,8 +13,8 @@ Head over to [the user docs][docs] for instructions on how to install scalafmt.
   - if you plan to develop the intellij plugin, run `downloadIdea` first to fetch the IntelliJ SDK (~600mb).
   - or, run `sbt test` or `sbt core/compile` (specific project).
 - Run all unit tests: `sbt test`
-- Run only formatting tests: `tests/testOnly *FormatTests`.
-- Write new formatting test: read [this doc](scalafmt-tests/src/test/resources/readme.md).
+- Run only formatting tests: `testsJVM/testOnly *FormatTests`.
+- Write new formatting test: read [this doc](scalafmt-tests/jvm/src/test/resources/readme.md).
 - Build docs: See instructions on the [site][docs-guide] or locally at `./docs/contributing-website.md`.
 - Hack on IntelliJ plugin: see [this doc](scalafmt-intellij/readme.md).
 - Hack on sbt plugin: run `sbt scripted`.
