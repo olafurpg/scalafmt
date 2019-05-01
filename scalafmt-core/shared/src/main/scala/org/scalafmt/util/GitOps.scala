@@ -1,10 +1,13 @@
 package org.scalafmt.util
 
-import scala.sys.process.ProcessLogger
 import scala.util.Try
 import scala.util.control.NonFatal
 
 import java.io.File
+import java.nio.file.Files
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import scala.collection.JavaConverters._
 
 trait GitOps {
   def diff(branch: String): Seq[AbsoluteFile]
@@ -16,25 +19,35 @@ object GitOps {
   def apply(): GitOps = new GitOpsImpl(AbsoluteFile.userDir)
 }
 
-class GitOpsImpl(private[util] val workingDirectory: AbsoluteFile)
+case class GitOpsImpl(private[util] val workingDirectory: AbsoluteFile)
     extends GitOps {
 
   private[util] def exec(cmd: Seq[String]): Try[Seq[String]] = {
     val gitRes: Try[String] = Try {
-      val lastError = new StringBuilder
-      val swallowStderr = ProcessLogger(_ => Unit, err => lastError.append(err))
       try {
-        sys.process
-          .Process(cmd, workingDirectory.jfile)
-          .!!(swallowStderr)
-          .trim
+        val process = new ProcessBuilder(cmd.asJava)
+          .directory(workingDirectory.jfile)
+          .start()
+        val out = new StringBuilder()
+        val reader =
+          new BufferedReader(new InputStreamReader(process.getInputStream()))
+        try {
+          var line = ""
+          while ({
+            line = reader.readLine()
+            line != null
+          }) {
+            out.append(line).append("\n")
+          }
+        } finally {
+          reader.close()
+        }
+        val exit = process.waitFor()
+        if (exit != 0) sys.error(s"exit=$exit")
+        out.toString()
       } catch {
         case NonFatal(e) =>
-          throw new IllegalStateException(
-            s"Failed to run command ${cmd.mkString(" ")}. " +
-              s"Error: ${lastError.toString()}",
-            e
-          )
+          throw new RuntimeException(s"command: ${cmd.mkString(" ")}", e)
       }
     }
     // Predef.augmentString = work around scala/bug#11125 on JDK 11

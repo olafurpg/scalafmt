@@ -6,8 +6,6 @@ def scala212 = "2.12.8"
 
 inThisBuild(
   List(
-
-
     organization := "org.scalameta",
     homepage := Some(url("https://github.com/scalameta/scalafmt")),
     licenses := List(

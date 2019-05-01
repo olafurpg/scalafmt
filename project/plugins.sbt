@@ -21,4 +21,4 @@ addSbtPlugin("org.jetbrains" % "sbt-idea-plugin" % "1.0.1")
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.1.18")
 // for Scala Native support
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "0.6.0")
-addSbtPlugin("org.scala-native"   % "sbt-scala-native"              % "0.3.10")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.3.10")
