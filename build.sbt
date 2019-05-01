@@ -201,7 +201,7 @@ lazy val tests = crossProject(JVMPlatform, NativePlatform)
     )
   )
   .dependsOn(
-    cliJVM
+    cli
   )
 lazy val testsJVM = tests.jvm
 lazy val testsNative = tests.native
