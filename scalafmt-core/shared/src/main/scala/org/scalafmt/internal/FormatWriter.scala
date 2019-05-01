@@ -128,7 +128,14 @@ class FormatWriter(formatOps: FormatOps) {
       }
       val extraIndent: Int = if (firstChar == '|') 1 else 0
       val spaces = " " * (indent + extraIndent)
-      leadingPipeSpace.matcher(token.syntax).replaceAll(s"\n$spaces\\|")
+      val out = new java.lang.StringBuffer
+      val replacement = s"\n$spaces|"
+      val matcher = leadingPipeSpace.matcher(token.syntax)
+      while (matcher.find()) {
+        matcher.appendReplacement(out, replacement)
+      }
+      matcher.appendTail(out)
+      out.toString()
     } else {
       token.syntax
     }
