@@ -189,7 +189,7 @@ lazy val intellij = project
   .dependsOn(coreJVM, cliJVM)
   .enablePlugins(SbtIdeaPlugin)
 
-lazy val tests = project
+lazy val tests = crossProject(JVMPlatform, NativePlatform)
   .in(file("scalafmt-tests"))
   .settings(
     skip in publish := true,
@@ -203,6 +203,8 @@ lazy val tests = project
   .dependsOn(
     cliJVM
   )
+lazy val testsJVM = tests.jvm
+lazy val testsNative = tests.native
 
 lazy val benchmarks = project
   .in(file("scalafmt-benchmarks"))
