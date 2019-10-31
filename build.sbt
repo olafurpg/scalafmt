@@ -2,7 +2,7 @@ import Dependencies._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 def scala211 = "2.11.12"
-def scala212 = "2.12.8"
+def scala212 = "2.12.10"
 def scala213 = "2.13.1"
 
 inThisBuild(
@@ -162,8 +162,26 @@ lazy val cli = project
         case _ => Seq.empty
       }
     },
-    scalacOptions ++= scalacJvmOptions.value
+    scalacOptions ++= scalacJvmOptions.value,
+    mainClass in GraalVMNativeImage := Some("bloop.bloopgun.Bloopgun"),
+    graalVMNativeImageOptions ++= {
+      val reflectionFile = Keys.sourceDirectory.in(Compile).value./("graal")./("reflection.json")
+      assert(reflectionFile.exists)
+      List(
+        "--no-server",
+        "--enable-http",
+        "--enable-https",
+        "-H:EnableURLProtocols=http,https",
+        "--enable-all-security-services",
+        "--no-fallback",
+        s"-H:ReflectionConfigurationFiles=$reflectionFile",
+        //"--allow-incomplete-classpath",
+        "-H:+ReportExceptionStackTraces"
+        //"--initialize-at-build-time=scala.Function1"
+      )
+    }
   )
+  .enablePlugins(GraalVMNativeImagePlugin)
   .dependsOn(coreJVM, dynamic)
 
 lazy val tests = project
