@@ -2,6 +2,7 @@ package org.scalafmt.internal
 
 import java.util.regex.Pattern
 
+import scala.collection.immutable.NVector
 import org.scalafmt.internal.FormatWriter.FormatLocation
 import org.scalafmt.util.TreeOps
 
@@ -18,7 +19,7 @@ class FormatWriter(formatOps: FormatOps) {
   import formatOps._
   import org.scalafmt.util.TreeOps._
 
-  def mkString(splits: Vector[Split]): String = {
+  def mkString(splits: NVector[Split]): String = {
     val sb = new StringBuilder()
     var lastState = State.start // used to calculate start of formatToken.right.
     reconstructPath(tokens, splits, debug = false) {
@@ -125,7 +126,7 @@ class FormatWriter(formatOps: FormatOps) {
 
   def getFormatLocations(
       toks: Array[FormatToken],
-      splits: Vector[Split],
+      splits: NVector[Split],
       debug: Boolean
   ): Array[FormatLocation] = {
     require(toks.length >= splits.length, "splits !=")
@@ -154,7 +155,7 @@ class FormatWriter(formatOps: FormatOps) {
     */
   def reconstructPath(
       toks: Array[FormatToken],
-      splits: Vector[Split],
+      splits: NVector[Split],
       debug: Boolean
   )(
       callback: (State, FormatToken, String, Map[FormatToken, Int]) => Unit

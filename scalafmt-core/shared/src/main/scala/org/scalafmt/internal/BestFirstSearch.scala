@@ -1,6 +1,7 @@
 package org.scalafmt.internal
 
 import scala.collection.mutable
+import scala.collection.immutable.NVector
 import scala.meta.Defn
 import scala.meta.tokens.Token
 
@@ -301,4 +302,4 @@ class BestFirstSearch(
   }
 }
 
-case class SearchResult(splits: Vector[Split], reachedEOF: Boolean)
+case class SearchResult(splits: NVector[Split], reachedEOF: Boolean)

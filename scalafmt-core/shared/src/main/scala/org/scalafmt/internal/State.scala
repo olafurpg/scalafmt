@@ -1,5 +1,6 @@
 package org.scalafmt.internal
 
+import scala.collection.immutable.NVector
 import scala.meta.tokens.Token
 import scala.meta.tokens.Token.Comment
 
@@ -14,7 +15,7 @@ import org.scalafmt.util.TokenOps
 final case class State(
     cost: Int,
     policy: PolicySummary,
-    splits: Vector[Split],
+    splits: NVector[Split],
     indentation: Int,
     pushes: Vector[Indent[Num]],
     column: Int,
@@ -53,7 +54,7 @@ object State {
   val start = State(
     0,
     PolicySummary.empty,
-    Vector.empty[Split],
+    NVector.empty[Split],
     0,
     Vector.empty[Indent[Num]],
     0,
