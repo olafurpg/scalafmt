@@ -359,6 +359,7 @@ class FormatWriter(formatOps: FormatOps) {
     if (initStyle.align.tokens.isEmpty || locations.length != tokens.length)
       Map.empty[FormatToken, Int]
     else {
+
       val finalResult = Map.newBuilder[FormatToken, Int]
       var i = 0
       var minMatches = Integer.MAX_VALUE
