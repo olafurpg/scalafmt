@@ -3,6 +3,7 @@ package org.scalafmt.internal
 import scala.collection.mutable
 import scala.meta.Defn
 import scala.meta.tokens.Token
+import scala.meta.internal.inputs._
 
 import org.scalafmt.Error.SearchStateExploded
 import org.scalafmt.config.FormatEvent.CompleteFormat
@@ -173,6 +174,8 @@ class BestFirstSearch(
         Q.dequeueAll
       } else if (shouldEnterState(curr)) {
         val splitToken = tokens(curr.splits.length)
+        // pprint.log(splitToken.left.structure)
+        // pprint.log(splitToken.right.structure)
         val style = styleMap.at(splitToken)
         if (curr.splits.length > deepestYet.splits.length) {
           deepestYet = curr
@@ -196,7 +199,13 @@ class BestFirstSearch(
           }
         } else if (emptyQueueSpots(hash(splitToken.left)) &&
           lastWasNewline) {
-          Q.dequeueAll
+          // pprint.log(splitToken.left.pos.formatMessage("", ""))
+          if (splitToken.left.syntax != "{")
+            Q.dequeueAll
+          else {
+            pprint.log(new FormatWriter(formatOps).mkString(curr.splits))
+            pprint.log(Q)
+          }
         }
 
         if (shouldRecurseOnBlock(curr, stop)) {

@@ -1,0 +1,23 @@
+style = default
+<<< ONLY issue 1599
+object A {
+  def foo() = {
+    x.map(_.y(
+      abcd,
+      { case ((abcdefghij, aswbasdfaw), asfda) => aswdf},
+      { case (abcdefg, sadfasdass) => (asdfa.sadvfs(abcdefghij).get, asdfasdfasfdasda.asdfas(asdfasdaas).get) },
+      foo
+    ))
+  }
+}
+>>>
+object A {
+  def foo() = {
+    x.map(_.y(
+      abcd,
+      { case ((abcdefghij, aswbasdfaw), asfda) => aswdf},
+      { case (abcdefghi, sadfasdass) => (asdfa.sadvfs(abcdefghij).get, asdfasdfasfdasda.asdfas(asdfasdaas).get) },
+      foo
+    ))
+  }
+}
