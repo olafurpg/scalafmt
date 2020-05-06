@@ -307,6 +307,48 @@ object ScalafmtConfig {
     danglingParentheses = DanglingParentheses(true, true)
   )
 
+  val twitter: ScalafmtConfig = default.copy(
+    maxColumn = 100,
+    docstrings = Docstrings.JavaDoc,
+    assumeStandardLibraryStripMargin = false,
+    align = Align.none,
+    continuationIndent = default.continuationIndent.copy(
+      callSite = 2,
+      defnSite = 2
+    ),
+    danglingParentheses = DanglingParentheses.shortcutFalse,
+    spaces = default.spaces.copy(
+      inImportCurlyBraces = false,
+      afterTripleEquals = true
+    ),
+    binPack = default.binPack.copy(
+      parentConstructors = false
+    ),
+    newlines = default.newlines.copy(
+      implicitParamListModifierForce = List(Newlines.before),
+      neverInResultType = false,
+      alwaysBeforeMultilineDef = false,
+      sometimesBeforeColonInMethodReturnType = false
+    ),
+    verticalMultiline = default.verticalMultiline.copy(
+      atDefnSite = true,
+      newlineAfterOpenParen = true,
+      newlineBeforeImplicitKW = true
+    ),
+    literals = default.literals.copy(
+      double = Case.Unchanged,
+      float = Case.Unchanged,
+      long = Case.Unchanged
+    ),
+    optIn = default.optIn.copy(
+      breaksInsideChains = true
+    ),
+    runner = default.runner.copy(
+      optimizer = default.runner.optimizer.copy(
+        escapeInPathologicalCases = false
+      )
+    )
+  )
   def addAlign(style: ScalafmtConfig): ScalafmtConfig =
     style.copy(
       align = style.align.copy(
@@ -350,7 +392,8 @@ object ScalafmtConfig {
   val activeStyles: Map[String, ScalafmtConfig] =
     Map(
       "Scala.js" -> scalaJs,
-      "IntelliJ" -> intellij
+      "IntelliJ" -> intellij,
+      "Twitter" -> twitter
     ) ++ LoggerOps.name2style(
       default,
       defaultWithAlign

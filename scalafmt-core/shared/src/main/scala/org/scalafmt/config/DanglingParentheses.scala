@@ -14,8 +14,8 @@ case class DanglingParentheses(
 
 object DanglingParentheses {
 
-  private val shortcutTrue = DanglingParentheses(true, true)
-  private val shortcutFalse = DanglingParentheses(false, false, false)
+  val shortcutTrue = DanglingParentheses(true, true)
+  val shortcutFalse = DanglingParentheses(false, false, false)
 
   val default = shortcutTrue
 

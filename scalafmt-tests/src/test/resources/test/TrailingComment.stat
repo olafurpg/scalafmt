@@ -1,0 +1,19 @@
+preset = twitter
+<<< ONLY lang-1730
+class chkfmt(
+  attr1: Int,
+  attr2: Int // break wrap
+) extends chkfmt1 {
+  def func1(): Unit = {
+    print("hello world")
+  }
+} 
+>>>
+class chkfmt(
+  attr1: Int,
+  attr2: Int // break wrap
+) extends chkfmt1 {
+  def func1(): Unit = {
+    print("hello world")
+  }
+} 
