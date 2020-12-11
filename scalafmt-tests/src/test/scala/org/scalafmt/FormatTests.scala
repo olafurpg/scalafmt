@@ -54,6 +54,13 @@ class FormatTests extends FunSuite with CanRunTests with FormatAssertions {
         e.partialOutput
       case x => x.get
     }
+    if (!onlyManual) {
+      assertEquals(
+        obtained,
+        t.expected,
+        "Obtained formatting output does not match the expected formatting output"
+      )
+    }
     debugResults += saveResult(t, obtained, debug)
     if (
       t.style.rewrite.rules.isEmpty &&
@@ -74,10 +81,7 @@ class FormatTests extends FunSuite with CanRunTests with FormatAssertions {
       )
       .get
     debug2.printTest()
-    assertNoDiff(formattedAgain, obtained, "Idempotency violated")
-    if (!onlyManual) {
-      assertNoDiff(obtained, t.expected)
-    }
+    assertEquals(formattedAgain, obtained, "Idempotency violated")
   }
 
   def testShouldRun(t: DiffTest): Boolean = !onlyOne || t.only

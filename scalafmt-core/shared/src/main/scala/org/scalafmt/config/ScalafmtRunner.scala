@@ -88,6 +88,10 @@ object ScalafmtRunner {
       .withAllowTrailingCommas(true)
     val default = scala213
     val Scala3 = Dotty
+      // Disable significant indentation because the exact syntax is still under
+      // development and is likely to change soon. See discussions at
+      // https://contributors.scala-lang.org/t/feedback-sought-optional-braces/4702
+      .withAllowSignificantIndentation(false)
 
     implicit lazy val decoder: ConfDecoder[Dialect] = {
       ReaderUtil.oneOf[Dialect](
