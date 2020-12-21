@@ -466,15 +466,19 @@ class Router(formatOps: FormatOps) {
           Split(NewlineT(isDouble = tok.hasBlankLine), 0)
         )
 
-      case tok @ FormatToken(_: T.RightParen, _: T.KwDef | _: T.Comment, _)
-          if leftOwner.is[Defn.ExtensionGroup] =>
-        // Force a newline with the body of a Defn.ExtensionGroup if the
-        // method doesn't fit on a single line.
-        import scala.meta.internal.inputs._
-        pprint.log(leftOwner.tokens.last.pos.formatMessage("", ""))
+      case tok @ FormatToken(_: T.RightParen, right, _)
+          if leftOwner.is[Defn.ExtensionGroup] && {
+            pprint.log(right.syntax)
+            pprint.log(nextNonComment(tok).right.syntax)
+            nextNonComment(tok).right.is[T.KwDef]
+          } =>
+        val newlinesMod =
+          if (right.is[T.Comment] && tok.newlinesBetween == 0) Space
+          else Newline
+        pprint.log(newlinesMod)
         Seq(
           Split(Space, 0).withSingleLine(leftOwner.tokens.last),
-          Split(Newline, 1).withIndent(2, leftOwner.tokens.last, After)
+          Split(newlinesMod, 1).withIndent(2, leftOwner.tokens.last, After)
         )
 
       case tok @ FormatToken(left, right, _)

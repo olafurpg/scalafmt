@@ -94,7 +94,7 @@ extension [AAaaaaaaaaaa](
   def add1(b: A) = a + b
   def add2(b: A) = a + b
 }
-<<< ONLY extension comment no-wrap
+<<< extension comment no-wrap
 extension   (a: Int) // Comment
   def add(b: A) = a + b
 >>>
@@ -116,3 +116,11 @@ extension (
     a: Int
 ) // My strategic comment
   def add(b: A) = a + b
+<<< braces + comment: avoid double indent
+extension   (a: Int) /* comment */ {
+  def add(b: A) = a + b
+}
+>>>
+extension (a: Int) /* comment */ {
+  def add(b: A) = a + b
+}
