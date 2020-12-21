@@ -217,6 +217,7 @@ lazy val tests = project
     ),
     scalacOptions ++= scalacJvmOptions.value,
     javaOptions += "-Dfile.encoding=UTF8",
+    fork := true,
     buildInfoPackage := "org.scalafmt.tests",
     buildInfoKeys := Seq[BuildInfoKey](
       "resourceDirectory" -> resourceDirectory.in(Test).value

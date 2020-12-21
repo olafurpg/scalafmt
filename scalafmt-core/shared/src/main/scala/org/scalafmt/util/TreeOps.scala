@@ -114,12 +114,7 @@ object TreeOps {
       t.tokens.find(!_.is[Trivia]).foreach(addTok(_, tree))
     def addAll(trees: Seq[Tree]) = trees.foreach(x => addTree(x, x))
 
-    def addDefnTokens[T](
-        mods: Seq[Mod],
-        tree: Tree,
-        what: String,
-        isMatch: Token => Boolean
-    ): Unit = {
+    def addDefn[T: ClassTag](mods: Seq[Mod], tree: Tree): Unit = {
       // Each @annotation gets a separate line
       val annotations = mods.filter(_.is[Mod.Annot])
       addAll(annotations)
@@ -128,20 +123,11 @@ object TreeOps {
         case Some(x) => addTree(x, tree)
         case _ =>
           // No non-annotation modifier exists, fallback to keyword like `object`
-          tree.tokens.find(isMatch) match {
+          tree.tokens.find(classTag[T].runtimeClass.isInstance) match {
             case Some(x) => addTok(x, tree)
-            case None =>
-              throw Error.CantFindDefnToken(what, tree)
+            case None => throw Error.CantFindDefnToken[T](tree)
           }
       }
-    }
-    def addDefn[T: ClassTag](mods: Seq[Mod], tree: Tree): Unit = {
-      addDefnTokens[T](
-        mods,
-        tree,
-        classTag[T].runtimeClass.getSimpleName(),
-        t => classTag[T].runtimeClass.isInstance(t)
-      )
     }
 
     def loop(x: Tree): Unit = {
@@ -151,8 +137,7 @@ object TreeOps {
         case t: Defn.Macro => addDefn[KwDef](t.mods, t)
         case t: Decl.Def => addDefn[KwDef](t.mods, t)
         case t: Defn.Enum => addDefn[KwEnum](t.mods, t)
-        case t: Defn.ExtensionGroup =>
-          addDefnTokens(Nil, t, "extension", t => ExtensionKeyword.unapply(t))
+        case t: Defn.ExtensionGroup => addDefn[KwExtension](Nil, t)
         case t: Defn.Object => addDefn[KwObject](t.mods, t)
         case t: Defn.Trait => addDefn[KwTrait](t.mods, t)
         case t: Defn.Type => addDefn[KwType](t.mods, t)

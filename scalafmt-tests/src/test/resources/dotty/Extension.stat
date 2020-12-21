@@ -94,3 +94,25 @@ extension [AAaaaaaaaaaa](
   def add1(b: A) = a + b
   def add2(b: A) = a + b
 }
+<<< ONLY extension comment no-wrap
+extension   (a: Int) // Comment
+  def add(b: A) = a + b
+>>>
+extension (a: Int) // Comment
+  def add(b: A) = a + b
+<<< ONLY extension single-line comment no-wrap
+class  A (a: Int) 
+    /* C */ {
+  def add(b: A) = a + b
+}
+>>>
+extension (a: Int) /* C */
+  def add(b: A) = a + b
+<<< extension comment wrap
+extension   (a: Int) // My strategic comment
+  def add(b: A) = a + b
+>>>
+extension (
+    a: Int
+) // My strategic comment
+  def add(b: A) = a + b
